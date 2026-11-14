@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#d6455d">
+  <title>Casual Japanese Translator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Casual Japanese Translator <span lang="ja">翻訳</span></h1>
+      <p class="sub">Type it or snap it. Pick how formal you want to sound.</p>
+    </header>
+
+    <form id="form">
+      <fieldset class="formality">
+        <legend>How formal?</legend>
+        <label><input type="radio" name="formality" value="casual"><span>Casual<small lang="ja">タメ口</small></span></label>
+        <label><input type="radio" name="formality" value="polite"><span>Polite<small lang="ja">です・ます</small></span></label>
+        <label><input type="radio" name="formality" value="both" checked><span>Both<small>side by side</small></span></label>
+      </fieldset>
+
+      <textarea id="text" rows="3" placeholder="e.g. Want to grab ramen after work?  — or paste Japanese"></textarea>
+
+      <div class="row">
+        <label class="photo-btn">
+          📷 Take / choose photo
+          <input id="photo" type="file" accept="image/*" capture="environment" hidden>
+        </label>
+        <button id="go" type="submit">Translate</button>
+      </div>
+
+      <div id="preview" hidden>
+        <img id="preview-img" alt="Photo to translate">
+        <button id="clear-photo" type="button" class="small">Remove photo</button>
+      </div>
+    </form>
+
+    <p id="status" role="status" aria-live="polite"></p>
+    <section id="results"></section>
+
+    <details id="settings">
+      <summary>Settings</summary>
+      <label for="api-key">Anthropic API key</label>
+      <input id="api-key" type="password" autocomplete="off" placeholder="sk-ant-…">
+      <button id="save-key" type="button" class="small">Save</button>
+      <p class="hint">Stored only in this browser and sent only to Anthropic's API.</p>
+    </details>
+  </main>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
