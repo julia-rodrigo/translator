@@ -1,9 +1,6 @@
-import Anthropic from "https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@1.3.0/+esm";
-import { SYSTEM_PROMPT, OUTPUT_SCHEMA } from "./prompt.js";
+import { PROVIDERS, translate, TranslateError } from "./providers.js";
+import { canSpeak, canListen, speak, startListening, stopListening, isListening } from "./voice.js";
 import { LEARN } from "./learn.js";
-
-const MODEL = "claude-opus-5-5";
-const KEY_STORAGE = "jp-translator-api-key";
 
 const $ = (id) => document.getElementById(id);
 const els = {
@@ -17,25 +14,80 @@ const els = {
   status: $("status"),
   results: $("results"),
   settings: $("settings"),
-  apiKey: $("api-key"),
-  saveKey: $("save-key"),
 };
 
 let photo = null; // { mediaType, data } base64
 
-// ---- API key (kept only in this browser) ----
-function getKey() {
-  try { return localStorage.getItem(KEY_STORAGE) || ""; } catch { return ""; }
+// ---- Settings: which engine, and its key/model (kept only on this device) ----
+const store = {
+  get(k) { try { return localStorage.getItem("jpt-" + k) || ""; } catch { return ""; } },
+  set(k, v) { try { localStorage.setItem("jpt-" + k, v); } catch {} },
+};
+// Carry over a key saved by the first version of the app.
+try {
+  const old = localStorage.getItem("jp-translator-api-key");
+  if (old && !store.get("key-claude")) { store.set("key-claude", old); store.set("provider", "claude"); }
+} catch {}
+
+const currentProvider = () => (PROVIDERS[store.get("provider")] ? store.get("provider") : "free");
+function providerSettings(id) {
+  const p = PROVIDERS[id];
+  return {
+    apiKey: store.get("key-" + id),
+    model: store.get("model-" + id) || p.defaultModel,
+    baseUrl: store.get("url-" + id) || p.defaultBaseUrl,
+  };
 }
-function setKey(k) {
-  try { localStorage.setItem(KEY_STORAGE, k); } catch {}
+
+for (const [id, p] of Object.entries(PROVIDERS)) {
+  const o = el("option", null, p.name);
+  o.value = id;
+  $("provider").append(o);
 }
-els.apiKey.value = getKey();
-if (!getKey()) els.settings.open = true;
-els.saveKey.addEventListener("click", () => {
-  setKey(els.apiKey.value.trim());
+function showProviderFields() {
+  const id = $("provider").value;
+  const p = PROVIDERS[id];
+  const cfg = providerSettings(id);
+  $("provider-note").textContent = p.note;
+  $("key-row").hidden = !p.needsKey;
+  $("api-key").value = cfg.apiKey;
+  $("model-row").hidden = !p.defaultModel;
+  $("url-row").hidden = !p.defaultBaseUrl;
+  $("base-url").value = cfg.baseUrl || "";
+  // Claude gets a fixed list; the others take any model name.
+  $("model-select").hidden = !p.models;
+  $("model-text").hidden = Boolean(p.models);
+  if (p.models) {
+    $("model-select").replaceChildren(...p.models.map(([value, label]) => {
+      const o = el("option", null, label);
+      o.value = value;
+      return o;
+    }));
+    $("model-select").value = cfg.model;
+  } else {
+    $("model-text").value = cfg.model || "";
+  }
+}
+function updateEngineLine() {
+  const id = currentProvider();
+  $("engine").textContent = `Translating with: ${PROVIDERS[id].name}`;
+  $("photo-label").hidden = !PROVIDERS[id].photos;
+  $("formality").disabled = id === "free";
+}
+$("provider").value = currentProvider();
+$("provider").addEventListener("change", showProviderFields);
+showProviderFields();
+updateEngineLine();
+$("save-settings").addEventListener("click", () => {
+  const id = $("provider").value;
+  const p = PROVIDERS[id];
+  store.set("provider", id);
+  if (p.needsKey) store.set("key-" + id, $("api-key").value.trim());
+  if (p.defaultModel) store.set("model-" + id, (p.models ? $("model-select").value : $("model-text").value.trim()) || p.defaultModel);
+  if (p.defaultBaseUrl) store.set("url-" + id, $("base-url").value.trim() || p.defaultBaseUrl);
   els.settings.open = false;
-  showStatus("API key saved on this device.");
+  updateEngineLine();
+  showStatus("Saved on this device.");
 });
 
 // ---- Photo: downscale before sending (smaller upload, same accuracy) ----
@@ -71,58 +123,28 @@ async function shrinkImage(file, maxSide) {
 els.form.addEventListener("submit", async (e) => {
   e.preventDefault();
   const text = els.text.value.trim();
-  const formality = new FormData(els.form).get("formality");
-  if (!text && !photo) return showStatus("Type something or add a photo.", true);
-  const apiKey = getKey();
-  if (!apiKey) {
+  const formality = new FormData(els.form).get("formality") || "both";
+  const id = currentProvider();
+  const usePhoto = PROVIDERS[id].photos ? photo : null;
+  if (!text && !usePhoto) return showStatus("Type something or add a photo.", true);
+  const cfg = providerSettings(id);
+  if (PROVIDERS[id].needsKey && !cfg.apiKey) {
     els.settings.open = true;
-    return showStatus("Add your Anthropic API key first.", true);
+    els.settings.scrollIntoView({ behavior: "smooth" });
+    return showStatus(`Add your ${PROVIDERS[id].name} API key in Settings first.`, true);
   }
-
-  const content = [];
-  if (photo) {
-    content.push({ type: "image", source: { type: "base64", media_type: photo.mediaType, data: photo.data } });
-  }
-  content.push({
-    type: "text",
-    text: `Formality: ${formality}\n\n${text || "Translate the text in this photo."}`,
-  });
 
   setBusy(true);
   els.results.innerHTML = "";
   try {
-    const client = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
-    const response = await client.beta.messages.create({
-      model: MODEL,
-      max_tokens: 16000,
-      betas: ["server-side-fallback-2026-07-01"],
-      fallbacks: "default",
-      output_config: { effort: "low", format: { type: "json_schema", schema: OUTPUT_SCHEMA } },
-      system: SYSTEM_PROMPT,
-      messages: [{ role: "user", content }],
-    });
-
-    if (response.stop_reason === "refusal") {
-      return showStatus("Claude couldn't translate that one. Try rewording it.", true);
-    }
-    const textBlock = response.content.find((b) => b.type === "text");
-    if (!textBlock) throw new Error("Empty response");
-    render(JSON.parse(textBlock.text));
+    render(await translate(id, { text, photo: usePhoto, formality }, cfg));
     showStatus("");
   } catch (err) {
-    showStatus(friendlyError(err), true);
+    showStatus(err instanceof TranslateError ? err.message : `Something went wrong: ${err.message}`, true);
   } finally {
     setBusy(false);
   }
 });
-
-function friendlyError(err) {
-  if (err instanceof Anthropic.AuthenticationError) return "That API key didn't work. Check it in Settings.";
-  if (err instanceof Anthropic.RateLimitError) return "Too many requests. Wait a moment and try again.";
-  if (err instanceof Anthropic.APIConnectionError) return "Couldn't reach the server. Check your connection.";
-  if (err instanceof Anthropic.APIError) return `Error ${err.status ?? ""}: ${err.message}`;
-  return `Something went wrong: ${err.message}`;
-}
 
 // ---- Rendering ----
 function render(result) {
@@ -149,7 +171,10 @@ function render(result) {
 
     const actions = el("div", "actions");
     actions.append(button("Copy", () => navigator.clipboard?.writeText(v.japanese)));
-    if ("speechSynthesis" in window) actions.append(button("🔊 Listen", () => speak(v.japanese)));
+    if (canSpeak) {
+      actions.append(button("🔊 Listen", () =>
+        speak(v.japanese, { slow: $("slow").checked }).catch(() => showStatus("Couldn't play the voice.", true))));
+    }
     card.append(actions);
     frag.append(card);
   }
@@ -182,45 +207,27 @@ function render(result) {
   els.results.append(frag);
 }
 
-function speak(text) {
-  speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = "ja-JP";
-  u.rate = $("slow").checked ? 0.6 : 0.95;
-  const ja = speechSynthesis.getVoices().find((v) => v.lang?.toLowerCase().startsWith("ja"));
-  if (ja) u.voice = ja;
-  speechSynthesis.speak(u);
-}
-if ("speechSynthesis" in window) $("slow-row").hidden = false;
+if (canSpeak) $("slow-row").hidden = false;
 
 // ---- Voice recognition: speak instead of typing ----
-const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-if (Recognition) {
+if (canListen) {
   const mic = $("mic");
-  let rec = null;
   $("mic-row").hidden = false;
   mic.addEventListener("click", () => {
-    if (rec) return rec.stop();
-    rec = new Recognition();
-    rec.lang = new FormData(els.form).get("mic-lang");
-    rec.interimResults = true;
-    rec.onresult = (e) => {
-      els.text.value = Array.from(e.results, (r) => r[0].transcript).join("");
-    };
-    rec.onerror = (e) => {
-      if (e.error === "not-allowed") showStatus("Allow the microphone in your browser to speak.", true);
-      else if (e.error !== "aborted" && e.error !== "no-speech") showStatus("Couldn't hear that. Try again.", true);
-    };
-    rec.onend = () => {
-      rec = null;
-      mic.textContent = "🎤 Speak";
-      mic.setAttribute("aria-pressed", "false");
-    };
+    if (isListening()) return stopListening();
     mic.textContent = "⏹ Listening… tap to stop";
     mic.setAttribute("aria-pressed", "true");
     showStatus("");
-    rec.start();
+    startListening(new FormData(els.form).get("mic-lang"), {
+      onText: (t) => { els.text.value = t; },
+      onError: (msg) => { resetMic(); showStatus(msg, true); },
+      onEnd: resetMic,
+    });
   });
+  function resetMic() {
+    mic.textContent = "🎤 Speak";
+    mic.setAttribute("aria-pressed", "false");
+  }
 }
 
 // Wrap the formality-specific substrings of a sentence in <mark>.

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Casual Japanese</string>
+    <string name="title_activity_main">Casual Japanese</string>
+    <string name="package_name">com.juliarodrigo.japanesetranslator</string>
+    <string name="custom_url_scheme">com.juliarodrigo.japanesetranslator</string>
+</resources>

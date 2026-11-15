@@ -1,28 +1,48 @@
 # Casual Japanese Translator 翻訳
 
-A phone-friendly web app that translates what you type, or what you photograph, into
-**casual** (タメ口) or **polite** (です・ます) Japanese, or both side by side. Paste or
-photograph Japanese and you get the English, how formal the original is, and a suggested reply.
+Translates what you type, say or photograph into **casual** (タメ口) or **polite** (です・ます)
+Japanese, or both side by side. Paste or photograph Japanese and you get the English, how formal
+the original is, and a suggested reply. It runs as a web page and as an Android app.
 
-Each result shows the Japanese, hiragana reading, romaji, a literal back-translation, a Copy
-button and a 🔊 Listen button (your phone's Japanese voice, with a slow mode). In Chrome you can also tap 🎤 Speak and say it in English or Japanese instead of typing.
+- The parts that make a sentence casual or polite are highlighted.
+- Each result has the reading, romaji, a literal meaning, a word list, Copy and 🔊 Listen (with a slow mode).
+- 🎤 Speak lets you talk instead of typing, in English or Japanese.
+- The **📖 Learn** tab has a casual-vs-polite tense chart for verbs, adjectives and nouns.
 
-The parts that make a sentence casual or polite are highlighted, each result comes with a short
-word list, and the **📖 Learn** tab has a casual-vs-polite tense chart for verbs, adjectives and nouns.
+## Translation engines (Settings)
+| Engine | Cost | Casual/polite, readings, words | Photos |
+|---|---|---|---|
+| Basic (no AI) | Free, no key | No, one plain translation | No |
+| Google Gemini | Free tier, key from aistudio.google.com | Yes | Yes |
+| ChatGPT (OpenAI) or compatible | Paid; or point it at Groq / OpenRouter | Yes | If the model supports images |
+| Claude | Paid, key from console.anthropic.com | Yes | Yes |
 
-## Use it
-1. Host the folder anywhere static (GitHub Pages works: Settings → Pages → deploy from this branch),
-   or run `npx serve .` locally. It has to be served over http(s); opening `index.html` as a file won't load the modules.
-2. Open it on your phone, tap **Settings**, and paste an Anthropic API key
-   (from console.anthropic.com). It's saved only in that browser.
-3. Pick a formality, type or tap **📷 Take / choose photo**, then **Translate**.
+Keys are stored only on the device and sent only to the engine you picked. The app starts on Basic.
+
+## Run it
+```
+npm install
+npm run build      # bundles src/ into docs/
+npm run serve      # open the printed address
+```
+`docs/` is committed, so GitHub Pages can serve it: Settings → Pages → this branch → `/docs`.
+
+## Android app
+```
+npm run android                      # build the web part and copy it into android/
+cd android && ./gradlew assembleDebug
+```
+The APK lands in `android/app/build/outputs/apk/debug/`. You need the Android SDK (`ANDROID_HOME`)
+and JDK 21. For Google Play you need a signed release bundle: `./gradlew bundleRelease` with your
+own signing key.
 
 ## Just want the prompt?
 [`PROMPT.md`](PROMPT.md) is a standalone prompt you can paste into Claude or a Claude Project.
-The Claude app can already take photos, so that gets you the same thing without hosting anything.
 
 ## Files
-- `learn.js`: tense chart data for the Learn tab
-- `prompt.js`: system prompt and JSON output schema the app sends
-- `app.js`: UI logic and the Claude API call (`claude-opus-5-5`, low effort, structured output)
-- `index.html`, `style.css`: the page
+- `src/providers.js`: the four translation engines
+- `src/voice.js`: speech recognition and playback (native in the Android app, Web Speech in browsers)
+- `src/prompt.js`: system prompt and JSON output schema for the AI engines
+- `src/learn.js`: tense chart data
+- `src/app.js`, `src/index.html`, `src/style.css`: the page
+- `android/`: Capacitor Android project

@@ -1,4 +1,4 @@
-// System prompt and output schema shared by the app. Keep in sync with PROMPT.md.
+// System prompt and output schema used by the AI engines. Keep in sync with PROMPT.md.
 
 export const SYSTEM_PROMPT = `You are a friendly Japanese translator for everyday life: chatting with friends, ordering food, reading signs and menus, texting coworkers.
 
@@ -64,3 +64,7 @@ export const OUTPUT_SCHEMA = {
   required: ["source_language", "scene", "versions", "vocab", "notes"],
   additionalProperties: false,
 };
+
+// For engines without schema-enforced output: the same shape, described in words.
+export const JSON_SHAPE_HINT = `Reply with only JSON in this shape:
+{"source_language": "English", "scene": "", "versions": [{"label": "Casual", "japanese": "…", "reading": "…", "romaji": "…", "back_translation": "…", "highlights": ["…"]}], "vocab": [{"word": "…", "reading": "…", "meaning": "…"}], "notes": ["…"]}`;

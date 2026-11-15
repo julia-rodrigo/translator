@@ -1,0 +1,22 @@
+{
+  "name": "casual-japanese-translator",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "serve": "npx serve docs",
+    "android": "npm run build && npx cap sync android"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "1.3.0",
+    "@capacitor-community/speech-recognition": "7.0.1",
+    "@capacitor-community/text-to-speech": "8.0.2",
+    "@capacitor/android": "8.6.2",
+    "@capacitor/core": "8.6.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.6.2",
+    "esbuild": "^0.25.0"
+  }
+}

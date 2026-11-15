@@ -112,3 +112,10 @@ th { font-size: 0.88rem; }
 th small { display: block; font-weight: 400; color: var(--muted); }
 td b { display: block; font-size: 1.05rem; }
 td i { color: var(--muted); font-size: 0.8rem; }
+
+select, input[type=text], input[type=url] {
+  width: 100%; padding: 12px; font: inherit; color: inherit;
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+}
+.formality:disabled { opacity: 0.45; }
+#engine { margin: 10px 0 0; }
