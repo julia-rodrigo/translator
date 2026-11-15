@@ -24,6 +24,12 @@
 
       <textarea id="text" rows="3" placeholder="e.g. Want to grab ramen after work?  — or paste Japanese"></textarea>
 
+      <div class="mic-row" id="mic-row" hidden>
+        <button id="mic" type="button" class="small" aria-pressed="false">🎤 Speak</button>
+        <label><input type="radio" name="mic-lang" value="en-US" checked> English</label>
+        <label><input type="radio" name="mic-lang" value="ja-JP"> <span lang="ja">日本語</span></label>
+      </div>
+
       <div class="row">
         <label class="photo-btn">
           📷 Take / choose photo
@@ -39,6 +45,7 @@
     </form>
 
     <p id="status" role="status" aria-live="polite"></p>
+    <label class="slow" id="slow-row" hidden><input id="slow" type="checkbox"> 🐢 Slow voice</label>
     <section id="results"></section>
 
     <details id="settings">

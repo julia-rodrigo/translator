@@ -84,3 +84,7 @@ button.small {
 #settings label { display: block; margin: 10px 0 4px; }
 #settings button { margin-top: 8px; }
 .hint { font-size: 0.8rem; }
+
+.mic-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 10px; }
+#mic[aria-pressed="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
+.slow { display: inline-block; color: var(--muted); margin-bottom: 8px; }

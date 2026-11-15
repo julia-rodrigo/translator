@@ -5,7 +5,7 @@ A phone-friendly web app that translates what you type, or what you photograph, 
 photograph Japanese and you get the English, how formal the original is, and a suggested reply.
 
 Each result shows the Japanese, hiragana reading, romaji, a literal back-translation, a Copy
-button and a 🔊 Listen button (uses your phone's Japanese voice).
+button and a 🔊 Listen button (your phone's Japanese voice, with a slow mode). In Chrome you can also tap 🎤 Speak and say it in English or Japanese instead of typing.
 
 ## Use it
 1. Host the folder anywhere static (GitHub Pages works: Settings → Pages → deploy from this branch),

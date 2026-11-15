@@ -164,7 +164,41 @@ function speak(text) {
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
   u.lang = "ja-JP";
+  u.rate = $("slow").checked ? 0.6 : 0.95;
+  const ja = speechSynthesis.getVoices().find((v) => v.lang?.toLowerCase().startsWith("ja"));
+  if (ja) u.voice = ja;
   speechSynthesis.speak(u);
+}
+if ("speechSynthesis" in window) $("slow-row").hidden = false;
+
+// ---- Voice recognition: speak instead of typing ----
+const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (Recognition) {
+  const mic = $("mic");
+  let rec = null;
+  $("mic-row").hidden = false;
+  mic.addEventListener("click", () => {
+    if (rec) return rec.stop();
+    rec = new Recognition();
+    rec.lang = new FormData(els.form).get("mic-lang");
+    rec.interimResults = true;
+    rec.onresult = (e) => {
+      els.text.value = Array.from(e.results, (r) => r[0].transcript).join("");
+    };
+    rec.onerror = (e) => {
+      if (e.error === "not-allowed") showStatus("Allow the microphone in your browser to speak.", true);
+      else if (e.error !== "aborted" && e.error !== "no-speech") showStatus("Couldn't hear that. Try again.", true);
+    };
+    rec.onend = () => {
+      rec = null;
+      mic.textContent = "🎤 Speak";
+      mic.setAttribute("aria-pressed", "false");
+    };
+    mic.textContent = "⏹ Listening… tap to stop";
+    mic.setAttribute("aria-pressed", "true");
+    showStatus("");
+    rec.start();
+  });
 }
 
 function el(tag, cls, text) {
