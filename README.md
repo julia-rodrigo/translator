@@ -7,6 +7,9 @@ photograph Japanese and you get the English, how formal the original is, and a s
 Each result shows the Japanese, hiragana reading, romaji, a literal back-translation, a Copy
 button and a 🔊 Listen button (your phone's Japanese voice, with a slow mode). In Chrome you can also tap 🎤 Speak and say it in English or Japanese instead of typing.
 
+The parts that make a sentence casual or polite are highlighted, each result comes with a short
+word list, and the **📖 Learn** tab has a casual-vs-polite tense chart for verbs, adjectives and nouns.
+
 ## Use it
 1. Host the folder anywhere static (GitHub Pages works: Settings → Pages → deploy from this branch),
    or run `npx serve .` locally. It has to be served over http(s); opening `index.html` as a file won't load the modules.
@@ -19,6 +22,7 @@ button and a 🔊 Listen button (your phone's Japanese voice, with a slow mode).
 The Claude app can already take photos, so that gets you the same thing without hosting anything.
 
 ## Files
+- `learn.js`: tense chart data for the Learn tab
 - `prompt.js`: system prompt and JSON output schema the app sends
 - `app.js`: UI logic and the Claude API call (`claude-opus-5-5`, low effort, structured output)
 - `index.html`, `style.css`: the page

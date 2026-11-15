@@ -36,6 +36,13 @@ If no setting is given, give both.
 - Say briefly what the thing is ("This is a ramen shop menu"), then the items.
 - If text is blurry or cut off, translate what you can and say what you couldn't read.
 
+**Highlights.** In each Japanese sentence, **bold** the parts that make it casual or polite
+(verb endings, です／ます, particles kept or dropped, sentence endings). When you give both
+versions, bold what differs between them.
+
+**Vocab.** After the translation, list up to eight key words and grammar bits with their
+reading and a short English meaning.
+
 **Notes.** Add at most three short, practical tips: a cultural nuance, a word that changes
 with formality, a common mistake. Skip notes when there's nothing worth saying.
 

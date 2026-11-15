@@ -1,5 +1,6 @@
 import Anthropic from "https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@1.3.0/+esm";
 import { SYSTEM_PROMPT, OUTPUT_SCHEMA } from "./prompt.js";
+import { LEARN } from "./learn.js";
 
 const MODEL = "claude-opus-5-5";
 const KEY_STORAGE = "jp-translator-api-key";
@@ -128,11 +129,15 @@ function render(result) {
   const frag = document.createDocumentFragment();
   if (result.scene) frag.append(el("p", "scene", result.scene));
 
+  let anyMarks = false;
   for (const v of result.versions) {
-    const card = el("article", "card");
+    const tone = /casual/i.test(v.label) ? " casual" : /polite/i.test(v.label) ? " polite" : "";
+    const card = el("article", "card" + tone);
     card.append(el("h3", "label", v.label));
-    const jp = el("p", "jp", v.japanese);
+    const jp = el("p", "jp");
     jp.lang = "ja";
+    markUp(jp, v.japanese, v.highlights);
+    if (jp.querySelector("mark")) anyMarks = true;
     card.append(jp);
     if (v.reading && v.reading !== v.japanese) {
       const r = el("p", "reading", v.reading);
@@ -149,6 +154,23 @@ function render(result) {
     frag.append(card);
   }
 
+  if (anyMarks) {
+    frag.querySelector(".card").before(
+      el("p", "legend", "Highlighted parts are what make each version casual or polite."));
+  }
+  if (result.vocab?.length) {
+    const vb = el("section", "vocab");
+    vb.append(el("h3", "label", "Words in this one"));
+    const dl = el("dl");
+    for (const w of result.vocab) {
+      const dt = el("dt", null, w.word);
+      dt.lang = "ja";
+      if (w.reading && w.reading !== w.word) dt.append(el("small", null, w.reading));
+      dl.append(dt, el("dd", null, w.meaning));
+    }
+    vb.append(dl);
+    frag.append(vb);
+  }
   if (result.notes?.length) {
     const notes = el("aside", "notes");
     notes.append(el("h3", "label", "Tips"));
@@ -198,6 +220,64 @@ if (Recognition) {
     mic.setAttribute("aria-pressed", "true");
     showStatus("");
     rec.start();
+  });
+}
+
+// Wrap the formality-specific substrings of a sentence in <mark>.
+function markUp(node, text, highlights = []) {
+  const ranges = highlights
+    .map((h) => [text.indexOf(h), h.length])
+    .filter(([i, len]) => i >= 0 && len > 0)
+    .sort((a, b) => a[0] - b[0]);
+  let pos = 0;
+  for (const [i, len] of ranges) {
+    if (i < pos) continue;
+    node.append(text.slice(pos, i), el("mark", null, text.slice(i, i + len)));
+    pos = i + len;
+  }
+  node.append(text.slice(pos));
+}
+
+// ---- Learn tab: tense chart ----
+function chartTable(rows) {
+  const t = el("table");
+  const head = el("tr");
+  head.append(el("th", null, "Form"), el("th", "c", "Casual"), el("th", "p", "Polite"));
+  t.append(head);
+  for (const [form, gloss, c, cr, p, pr] of rows) {
+    const tr = el("tr");
+    const th = el("th", null, form);
+    if (gloss) th.append(el("small", null, gloss));
+    tr.append(th);
+    for (const [jp, ro] of [[c, cr], [p, pr]]) {
+      const td = el("td");
+      const b = el("b", null, jp);
+      b.lang = "ja";
+      td.append(b, el("i", null, ro));
+      tr.append(td);
+    }
+    t.append(tr);
+  }
+  return t;
+}
+function showVerb(i) {
+  const v = LEARN.verbs[i];
+  [...$("verbs").children].forEach((b, j) => b.setAttribute("aria-pressed", j === i));
+  $("verb-kind").textContent = `${v.key} (${v.kana}) means "${v.en}". It's ${v.kind}.`;
+  $("verb-table").replaceChildren(chartTable(v.rows));
+}
+LEARN.verbs.forEach((v, i) => {
+  const b = button(`${v.key} · ${v.en}`, () => showVerb(i));
+  $("verbs").append(b);
+});
+showVerb(0);
+for (const d of LEARN.describing) {
+  $("describing").append(el("h3", "label", d.title), el("p", "hint", d.sub), chartTable(d.rows));
+}
+for (const [tab, view] of [["nav-translate", "view-translate"], ["nav-learn", "view-learn"]]) {
+  $(tab).addEventListener("click", () => {
+    for (const id of ["view-translate", "view-learn"]) $(id).hidden = id !== view;
+    for (const id of ["nav-translate", "nav-learn"]) $(id).setAttribute("aria-selected", id === tab);
   });
 }
 

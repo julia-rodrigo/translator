@@ -14,6 +14,12 @@
       <p class="sub">Type it or snap it. Pick how formal you want to sound.</p>
     </header>
 
+    <nav class="nav">
+      <button type="button" id="nav-translate" aria-selected="true">Translate</button>
+      <button type="button" id="nav-learn" aria-selected="false">📖 Learn</button>
+    </nav>
+
+    <div id="view-translate">
     <form id="form">
       <fieldset class="formality">
         <legend>How formal?</legend>
@@ -47,6 +53,20 @@
     <p id="status" role="status" aria-live="polite"></p>
     <label class="slow" id="slow-row" hidden><input id="slow" type="checkbox"> 🐢 Slow voice</label>
     <section id="results"></section>
+    </div>
+
+    <section id="view-learn" class="learn" hidden>
+      <h3 class="label">Verb chart</h3>
+      <p>Japanese has two tenses: <strong>past</strong> and <strong>not past</strong> (now and future share one form). Each has a casual and a polite version. Pick a verb:</p>
+      <div id="verbs" class="actions"></div>
+      <p id="verb-kind" class="hint"></p>
+      <div id="verb-table"></div>
+      <div id="describing"></div>
+      <h3 class="label">Quick rules</h3>
+      <p><strong>Casual → polite:</strong> verbs swap their ending for <span lang="ja">ます</span>; nouns and adjectives add <span lang="ja">です</span>.</p>
+      <p><strong>Particles</strong> like <span lang="ja">を</span> and <span lang="ja">は</span> are often dropped in casual talk and kept in polite talk.</p>
+      <p><strong>Questions:</strong> polite adds <span lang="ja">か</span>; casual just raises the voice, or ends in <span lang="ja">の？</span></p>
+    </section>
 
     <details id="settings">
       <summary>Settings</summary>

@@ -21,6 +21,10 @@ Photos (signs, menus, labels, screens, handwritten notes):
 - If text is blurry or cut off, translate what you can and say what you couldn't read in the notes.
 - If the photo has no Japanese, translate any text in it into Japanese at the requested formality instead.
 
+Highlights: in every entry, "highlights" lists the exact substrings, copied character for character from that entry's "japanese", that make it casual or polite (verb endings, copula, particles kept or dropped, pronouns, sentence endings). When both versions are given, highlight the parts that differ between them. Use an empty list for photo items and anything with no formality marker.
+
+Vocab: "vocab" lists the key words and grammar bits used across the entries, in order of appearance, at most 8, in dictionary form where it helps. "meaning" is short English; for grammar bits say what they do.
+
 Notes: at most three short, practical tips (a cultural nuance, a word that changes with formality, a common mistake). Use an empty list when there's nothing worth saying.
 
 Keep everything short and friendly.`;
@@ -40,13 +44,23 @@ export const OUTPUT_SCHEMA = {
           reading: { type: "string" },
           romaji: { type: "string" },
           back_translation: { type: "string" },
+          highlights: { type: "array", items: { type: "string" } },
         },
-        required: ["label", "japanese", "reading", "romaji", "back_translation"],
+        required: ["label", "japanese", "reading", "romaji", "back_translation", "highlights"],
+        additionalProperties: false,
+      },
+    },
+    vocab: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: { word: { type: "string" }, reading: { type: "string" }, meaning: { type: "string" } },
+        required: ["word", "reading", "meaning"],
         additionalProperties: false,
       },
     },
     notes: { type: "array", items: { type: "string" } },
   },
-  required: ["source_language", "scene", "versions", "notes"],
+  required: ["source_language", "scene", "versions", "vocab", "notes"],
   additionalProperties: false,
 };
