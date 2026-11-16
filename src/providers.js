@@ -5,11 +5,17 @@ import Anthropic from "@anthropic-ai/sdk";
 import { SYSTEM_PROMPT, OUTPUT_SCHEMA, JSON_SHAPE_HINT } from "./prompt.js";
 
 export const PROVIDERS = {
-  free: {
-    name: "Basic (no AI, free)",
-    needsKey: false,
-    photos: false,
-    note: "Free and needs no key. Gives one plain translation: no casual/polite choice, no readings, no photos.",
+  claude: {
+    name: "Claude (Anthropic)",
+    needsKey: true,
+    photos: true,
+    defaultModel: "claude-haiku-5-5",
+    models: [
+      ["claude-haiku-5-5", "Haiku 5.5 (cheapest, fast)"],
+      ["claude-sonnet-5-5", "Sonnet 5.5"],
+      ["claude-opus-5-5", "Opus 5.5 (best)"],
+    ],
+    note: "Paid. Get a key at console.anthropic.com.",
   },
   gemini: {
     name: "Google Gemini",
@@ -26,17 +32,11 @@ export const PROVIDERS = {
     defaultBaseUrl: "https://api.openai.com/v1",
     note: "OpenAI's API is paid (separate from the free ChatGPT app). Change the address to use another OpenAI-compatible service, such as Groq or OpenRouter.",
   },
-  claude: {
-    name: "Claude (Anthropic)",
-    needsKey: true,
-    photos: true,
-    defaultModel: "claude-haiku-5-5",
-    models: [
-      ["claude-haiku-5-5", "Haiku 5.5 (cheapest, fast)"],
-      ["claude-sonnet-5-5", "Sonnet 5.5"],
-      ["claude-opus-5-5", "Opus 5.5 (best)"],
-    ],
-    note: "Paid. Get a key at console.anthropic.com.",
+  free: {
+    name: "Basic (no AI, free)",
+    needsKey: false,
+    photos: false,
+    note: "Free and needs no key. Gives one plain translation: no casual/polite choice, no readings, no photos.",
   },
 };
 

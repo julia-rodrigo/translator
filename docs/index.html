@@ -5,13 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#d6455d">
   <title>Casual Japanese Translator</title>
+  <link rel="icon" href="icon.png">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <main>
     <header>
-      <h1>Casual Japanese Translator <span lang="ja">翻訳</span></h1>
-      <p class="sub">Type it or snap it. Pick how formal you want to sound.</p>
+      <img src="icon.png" alt="" width="52" height="52">
+      <div>
+        <h1>Casual Japanese Translator</h1>
+        <p class="sub">Type it, say it or snap it. Pick how formal you want to sound.</p>
+      </div>
     </header>
 
     <nav class="nav">
@@ -20,6 +24,16 @@
     </nav>
 
     <div id="view-translate">
+    <section id="setup" class="setup" hidden>
+      <h2>Add your Claude API key to start</h2>
+      <p>The app translates with Claude, using your own key. It's saved only on this phone.</p>
+      <label for="setup-key">Claude API key</label>
+      <input id="setup-key" type="password" autocomplete="off" placeholder="sk-ant-…">
+      <button id="setup-save" type="button" class="primary">Save key</button>
+      <p class="hint">Get a key at console.anthropic.com → API keys.</p>
+      <p class="hint">No key? <button id="setup-free" type="button" class="link">Use the free basic translator</button>, or pick Gemini or ChatGPT in Settings.</p>
+    </section>
+
     <form id="form">
       <fieldset class="formality" id="formality">
         <legend>How formal?</legend>
@@ -50,7 +64,8 @@
       </div>
     </form>
 
-    <p id="engine" class="hint"></p>
+    <p id="engine" class="hint"><span id="engine-name"></span> <button id="engine-change" type="button" class="link">Change</button></p>
+    <p id="basic-note" class="hint" hidden>Basic mode gives one plain translation, so there's no casual or polite choice and no photos. Add an AI key in Settings to get them.</p>
     <p id="status" role="status" aria-live="polite"></p>
     <label class="slow" id="slow-row" hidden><input id="slow" type="checkbox"> 🐢 Slow voice</label>
     <section id="results"></section>

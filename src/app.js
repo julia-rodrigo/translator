@@ -29,7 +29,7 @@ try {
   if (old && !store.get("key-claude")) { store.set("key-claude", old); store.set("provider", "claude"); }
 } catch {}
 
-const currentProvider = () => (PROVIDERS[store.get("provider")] ? store.get("provider") : "free");
+const currentProvider = () => (PROVIDERS[store.get("provider")] ? store.get("provider") : "claude");
 function providerSettings(id) {
   const p = PROVIDERS[id];
   return {
@@ -70,10 +70,38 @@ function showProviderFields() {
 }
 function updateEngineLine() {
   const id = currentProvider();
-  $("engine").textContent = `Translating with: ${PROVIDERS[id].name}`;
+  $("engine-name").textContent = `Translating with: ${PROVIDERS[id].name}`;
   $("photo-label").hidden = !PROVIDERS[id].photos;
-  $("formality").disabled = id === "free";
+  // Basic mode can't choose a formality, so the picker is hidden rather than greyed out.
+  $("formality").hidden = id === "free";
+  $("basic-note").hidden = id !== "free";
+  // First run: ask for the Claude key up front.
+  $("setup").hidden = !(id === "claude" && !store.get("key-claude"));
 }
+function openSettings() {
+  $("provider").value = currentProvider();
+  showProviderFields();
+  els.settings.open = true;
+  els.settings.scrollIntoView({ behavior: "smooth" });
+}
+$("engine-change").addEventListener("click", openSettings);
+$("setup-save").addEventListener("click", () => {
+  const key = $("setup-key").value.trim();
+  if (!key) return showStatus("Paste your Claude API key first.", true);
+  store.set("provider", "claude");
+  store.set("key-claude", key);
+  $("setup-key").value = "";
+  showProviderFields();
+  updateEngineLine();
+  showStatus("Key saved on this phone. You're ready to translate.");
+});
+$("setup-free").addEventListener("click", () => {
+  store.set("provider", "free");
+  $("provider").value = "free";
+  showProviderFields();
+  updateEngineLine();
+  showStatus("Using the free basic translator.");
+});
 $("provider").value = currentProvider();
 $("provider").addEventListener("change", showProviderFields);
 showProviderFields();
@@ -129,9 +157,13 @@ els.form.addEventListener("submit", async (e) => {
   if (!text && !usePhoto) return showStatus("Type something or add a photo.", true);
   const cfg = providerSettings(id);
   if (PROVIDERS[id].needsKey && !cfg.apiKey) {
-    els.settings.open = true;
-    els.settings.scrollIntoView({ behavior: "smooth" });
-    return showStatus(`Add your ${PROVIDERS[id].name} API key in Settings first.`, true);
+    if (id === "claude") {
+      $("setup").scrollIntoView({ behavior: "smooth" });
+      $("setup-key").focus();
+    } else {
+      openSettings();
+    }
+    return showStatus(`Add your ${PROVIDERS[id].name} API key first.`, true);
   }
 
   setBusy(true);

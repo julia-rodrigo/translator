@@ -14,4 +14,5 @@ await build({
 });
 await cp("src/index.html", "docs/index.html");
 await cp("src/style.css", "docs/style.css");
+await cp("src/icon.png", "docs/icon.png");
 console.log("Built docs/");

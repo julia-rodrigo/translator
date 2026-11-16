@@ -12,12 +12,13 @@ the original is, and a suggested reply. It runs as a web page and as an Android 
 ## Translation engines (Settings)
 | Engine | Cost | Casual/polite, readings, words | Photos |
 |---|---|---|---|
-| Basic (no AI) | Free, no key | No, one plain translation | No |
+| Claude (default) | Paid, key from console.anthropic.com | Yes | Yes |
 | Google Gemini | Free tier, key from aistudio.google.com | Yes | Yes |
 | ChatGPT (OpenAI) or compatible | Paid; or point it at Groq / OpenRouter | Yes | If the model supports images |
-| Claude | Paid, key from console.anthropic.com | Yes | Yes |
+| Basic (no AI) | Free, no key | No, one plain translation | No |
 
-Keys are stored only on the device and sent only to the engine you picked. The app starts on Basic.
+The app ships with no key inside it. On first launch it asks each person for their own Claude key,
+which is stored only on their device and sent only to the engine they picked.
 
 ## Run it
 ```
@@ -46,3 +47,4 @@ own signing key.
 - `src/learn.js`: tense chart data
 - `src/app.js`, `src/index.html`, `src/style.css`: the page
 - `android/`: Capacitor Android project
+- `store/icon-512.png`: app icon at the size Google Play asks for

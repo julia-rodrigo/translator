@@ -21,6 +21,7 @@
   }
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 body {
   margin: 0;
   background: var(--bg);
@@ -117,5 +118,15 @@ select, input[type=text], input[type=url] {
   width: 100%; padding: 12px; font: inherit; color: inherit;
   background: var(--card); border: 1px solid var(--border); border-radius: 12px;
 }
-.formality:disabled { opacity: 0.45; }
 #engine { margin: 10px 0 0; }
+
+header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+header img { border-radius: 12px; flex: none; }
+header .sub { margin: 2px 0 0; }
+.setup { background: var(--card); border: 2px solid var(--accent); border-radius: 16px; padding: 16px; margin-bottom: 16px; }
+.setup h2 { margin: 0 0 4px; font-size: 1.1rem; }
+.setup p { margin: 0 0 10px; }
+.setup label { display: block; font-weight: 600; margin-bottom: 4px; }
+.setup .hint { margin: 8px 0 0; color: var(--muted); }
+button.primary { width: 100%; margin-top: 10px; padding: 12px; border: 0; border-radius: 12px; background: var(--accent); color: #fff; font: inherit; font-weight: 600; cursor: pointer; }
+button.link { border: 0; background: none; padding: 0; font: inherit; color: var(--accent); text-decoration: underline; cursor: pointer; }
