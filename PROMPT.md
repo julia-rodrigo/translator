@@ -17,6 +17,15 @@ food, reading signs and menus, texting coworkers.
 
 If no setting is given, give both.
 
+**Dialect.** Requests can also ask for a dialect, on top of the formality:
+- **Standard** (標準語): Tokyo-style Japanese.
+- **Osaka-ben** (大阪弁): や for だ, 〜へん negatives, 〜ねん, ほんま, めっちゃ, あかん, ちゃう, せやな,
+  おおきに. Polite Osaka keeps です／ます with Kansai flavour (〜はります).
+- **Kyoto-ben** (京都弁): softer; 〜はる as an everyday honorific, 〜え / 〜やし endings, 〜よし for
+  gentle requests. 〜どす / 〜おす are traditional (maiko, older speakers), so mention rather than default to them.
+Label each version with formality and dialect ("Casual · Osaka"), highlight the dialect words too,
+and explain at least one dialect feature.
+
 **Translating into Japanese** (the input is English or another language):
 - Translate the way a native speaker would actually say it, not word for word.
 - For each version give the Japanese, the reading in hiragana, romaji, and a literal

@@ -48,5 +48,21 @@ export const LEARN = {
       ["Isn't", "", "学生じゃない", "gakusei ja nai", "学生じゃないです", "gakusei ja nai desu"],
       ["Was", "", "学生だった", "gakusei datta", "学生でした", "gakusei deshita"],
       ["Wasn't", "", "学生じゃなかった", "gakusei ja nakatta", "学生じゃなかったです", "gakusei ja nakatta desu"] ] }
+  ],
+  // [meaning, [standard, romaji], [Osaka, romaji], [Kyoto, romaji]]
+  dialects: [
+    ["is (casual)", ["だ", "da"], ["や", "ya"], ["や", "ya"]],
+    ["isn't / no way", ["違う", "chigau"], ["ちゃう", "chau"], ["ちゃう", "chau"]],
+    ["don't go", ["行かない", "ikanai"], ["行かへん / 行かん", "ikahen / ikan"], ["行かへん", "ikahen"]],
+    ["really", ["本当", "hontō"], ["ほんま", "honma"], ["ほんま", "honma"]],
+    ["very", ["とても", "totemo"], ["めっちゃ", "meccha"], ["えらい / ようけ", "erai / yōke"]],
+    ["no good / don't", ["だめ", "dame"], ["あかん", "akan"], ["あかん", "akan"]],
+    ["that's right", ["そうだね", "sō da ne"], ["せやな", "seya na"], ["そやね", "soya ne"]],
+    ["so / because", ["だから", "dakara"], ["せやから", "seyakara"], ["そやし", "soyashi"]],
+    ["how much?", ["いくら？", "ikura?"], ["なんぼ？", "nanbo?"], ["なんぼ？", "nanbo?"]],
+    ["thank you", ["ありがとう", "arigatō"], ["おおきに", "ōkini"], ["おおきに", "ōkini"]],
+    ["(someone) goes, respectful", ["行かれる", "ikareru"], ["行かはる", "ikaharu"], ["行かはる", "ikaharu"]],
+    ["please eat (gentle)", ["食べて", "tabete"], ["食べや", "tabe ya"], ["食べよし", "tabe yoshi"]],
+    ["it is (polite, old-style)", ["です", "desu"], ["だす", "dasu"], ["どす", "dosu"]]
   ]
 };

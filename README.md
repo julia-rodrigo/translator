@@ -7,6 +7,8 @@ the original is, and a suggested reply. It runs as a web page and as an Android 
 - The parts that make a sentence casual or polite are highlighted.
 - Each result has the reading, romaji, a literal meaning, a word list, Copy and 🔊 Listen (with a slow mode).
 - 🎤 Speak lets you talk instead of typing, in English or Japanese.
+- **Dialect**: Standard (標準語), Osaka-ben (大阪弁) or Kyoto-ben (京都弁), combined with casual or polite.
+  The Learn tab has an Osaka/Kyoto cheat sheet. The app remembers your last formality and dialect.
 - The **📖 Learn** tab has a casual-vs-polite tense chart for verbs, adjectives and nouns.
 
 ## Translation engines (Settings)

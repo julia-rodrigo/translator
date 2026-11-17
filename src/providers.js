@@ -1,4 +1,4 @@
-// Translation engines. Each takes { text, photo, formality } and returns the result object
+// Translation engines. Each takes { text, photo, formality, dialect } and returns the result object
 // described by OUTPUT_SCHEMA in prompt.js (the non-AI engine fills only what it can).
 
 import Anthropic from "@anthropic-ai/sdk";
@@ -42,8 +42,8 @@ export const PROVIDERS = {
 
 export class TranslateError extends Error {}
 
-function userText({ text, formality }) {
-  return `Formality: ${formality}\n\n${text || "Translate the text in this photo."}`;
+function userText({ text, formality, dialect = "standard" }) {
+  return `Formality: ${formality}\nDialect: ${dialect}\n\n${text || "Translate the text in this photo."}`;
 }
 
 function parseJson(raw) {

@@ -42,6 +42,14 @@
         <label><input type="radio" name="formality" value="both" checked><span>Both<small>side by side</small></span></label>
       </fieldset>
 
+      <fieldset class="formality dialect" id="dialect">
+        <legend>Dialect</legend>
+        <label><input type="radio" name="dialect" value="standard" checked><span>Standard<small lang="ja">標準語</small></span></label>
+        <label><input type="radio" name="dialect" value="osaka"><span>Osaka<small lang="ja">大阪弁</small></span></label>
+        <label><input type="radio" name="dialect" value="kyoto"><span>Kyoto<small lang="ja">京都弁</small></span></label>
+      </fieldset>
+      <p class="hint" id="dialect-note" hidden>Listen uses the phone's standard Japanese voice, so the words are Kansai but the intonation won't be.</p>
+
       <textarea id="text" rows="3" placeholder="e.g. Want to grab ramen after work?  — or paste Japanese"></textarea>
 
       <div class="mic-row" id="mic-row" hidden>
@@ -78,6 +86,9 @@
       <p id="verb-kind" class="hint"></p>
       <div id="verb-table"></div>
       <div id="describing"></div>
+      <h3 class="label">Osaka-ben and Kyoto-ben</h3>
+      <p class="hint">Everyday words that change in Kansai. Osaka sounds lively and direct; Kyoto sounds softer and uses はる a lot.</p>
+      <div id="dialect-table"></div>
       <h3 class="label">Quick rules</h3>
       <p><strong>Casual → polite:</strong> verbs swap their ending for <span lang="ja">ます</span>; nouns and adjectives add <span lang="ja">です</span>.</p>
       <p><strong>Particles</strong> like <span lang="ja">を</span> and <span lang="ja">は</span> are often dropped in casual talk and kept in polite talk.</p>

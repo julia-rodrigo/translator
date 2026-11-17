@@ -74,6 +74,8 @@ function updateEngineLine() {
   $("photo-label").hidden = !PROVIDERS[id].photos;
   // Basic mode can't choose a formality, so the picker is hidden rather than greyed out.
   $("formality").hidden = id === "free";
+  $("dialect").hidden = id === "free";
+  updateDialectNote();
   $("basic-note").hidden = id !== "free";
   // First run: ask for the Claude key up front.
   $("setup").hidden = !(id === "claude" && !store.get("key-claude"));
@@ -103,6 +105,18 @@ $("setup-free").addEventListener("click", () => {
   showStatus("Using the free basic translator.");
 });
 $("provider").value = currentProvider();
+// Remember the last formality and dialect picked.
+function updateDialectNote() {
+  const d = new FormData(els.form).get("dialect");
+  $("dialect-note").hidden = currentProvider() === "free" || d === "standard";
+}
+for (const name of ["formality", "dialect"]) {
+  const saved = store.get(name);
+  const input = saved && els.form.querySelector(`input[name="${name}"][value="${saved}"]`);
+  if (input) input.checked = true;
+  els.form.querySelectorAll(`input[name="${name}"]`).forEach((r) =>
+    r.addEventListener("change", () => { store.set(name, r.value); updateDialectNote(); }));
+}
 $("provider").addEventListener("change", showProviderFields);
 showProviderFields();
 updateEngineLine();
@@ -152,6 +166,7 @@ els.form.addEventListener("submit", async (e) => {
   e.preventDefault();
   const text = els.text.value.trim();
   const formality = new FormData(els.form).get("formality") || "both";
+  const dialect = new FormData(els.form).get("dialect") || "standard";
   const id = currentProvider();
   const usePhoto = PROVIDERS[id].photos ? photo : null;
   if (!text && !usePhoto) return showStatus("Type something or add a photo.", true);
@@ -169,7 +184,7 @@ els.form.addEventListener("submit", async (e) => {
   setBusy(true);
   els.results.innerHTML = "";
   try {
-    render(await translate(id, { text, photo: usePhoto, formality }, cfg));
+    render(await translate(id, { text, photo: usePhoto, formality, dialect }, cfg));
     showStatus("");
   } catch (err) {
     showStatus(err instanceof TranslateError ? err.message : `Something went wrong: ${err.message}`, true);
@@ -310,6 +325,25 @@ LEARN.verbs.forEach((v, i) => {
   $("verbs").append(b);
 });
 showVerb(0);
+{
+  const t = el("table");
+  const head = el("tr");
+  head.append(el("th", null, "Meaning"), el("th", null, "Standard"), el("th", "c", "Osaka"), el("th", "p", "Kyoto"));
+  t.append(head);
+  for (const [meaning, ...forms] of LEARN.dialects) {
+    const tr = el("tr");
+    tr.append(el("th", null, meaning));
+    for (const [jp, ro] of forms) {
+      const td = el("td");
+      const b = el("b", null, jp);
+      b.lang = "ja";
+      td.append(b, el("i", null, ro));
+      tr.append(td);
+    }
+    t.append(tr);
+  }
+  $("dialect-table").append(t);
+}
 for (const d of LEARN.describing) {
   $("describing").append(el("h3", "label", d.title), el("p", "hint", d.sub), chartTable(d.rows));
 }
