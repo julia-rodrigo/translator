@@ -134,3 +134,4 @@ button.link { border: 0; background: none; padding: 0; font: inherit; color: var
 #dialect-table th, #dialect-table td { padding: 8px 4px; }
 #dialect-table td b { font-size: 0.95rem; word-break: keep-all; overflow-wrap: normal; }
 #dialect-table tr > th:first-child { width: 26%; font-size: 0.8rem; }
+button.secondary { width: 100%; margin-top: 8px; padding: 11px; border: 1px solid var(--accent); border-radius: 12px; background: var(--card); color: var(--accent); font: inherit; font-weight: 600; cursor: pointer; }

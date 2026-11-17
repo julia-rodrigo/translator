@@ -31,7 +31,9 @@
       <input id="setup-key" type="password" autocomplete="off" placeholder="sk-ant-…">
       <button id="setup-save" type="button" class="primary">Save key</button>
       <p class="hint">Get a key at console.anthropic.com → API keys.</p>
-      <p class="hint">No key? <button id="setup-free" type="button" class="link">Use the free basic translator</button>, or pick Gemini or ChatGPT in Settings.</p>
+      <button id="setup-builtin" type="button" class="secondary" hidden>Use the built-in Phone AI instead (free, no key)</button>
+      <p class="hint" id="setup-builtin-note"></p>
+      <p class="hint">No key? <button id="setup-free" type="button" class="link">Use the free translator without AI</button>, or pick Gemini or ChatGPT in Settings.</p>
     </section>
 
     <form id="form">
@@ -73,7 +75,7 @@
     </form>
 
     <p id="engine" class="hint"><span id="engine-name"></span> <button id="engine-change" type="button" class="link">Change</button></p>
-    <p id="basic-note" class="hint" hidden>Basic mode gives one plain translation, so there's no casual or polite choice and no photos. Add an AI key in Settings to get them.</p>
+    <p id="basic-note" class="hint" hidden>This translator isn't AI, so it gives one plain translation with no casual, polite or dialect choice. Pick Claude or the Phone AI in Settings for those.</p>
     <p id="status" role="status" aria-live="polite"></p>
     <label class="slow" id="slow-row" hidden><input id="slow" type="checkbox"> 🐢 Slow voice</label>
     <section id="results"></section>

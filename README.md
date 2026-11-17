@@ -17,7 +17,9 @@ the original is, and a suggested reply. It runs as a web page and as an Android 
 | Claude (default) | Paid, key from console.anthropic.com | Yes | Yes |
 | Google Gemini | Free tier, key from aistudio.google.com | Yes | Yes |
 | ChatGPT (OpenAI) or compatible | Paid; or point it at Groq / OpenRouter | Yes | If the model supports images |
-| Basic (no AI) | Free, no key | No, one plain translation | No |
+| Built-in Phone AI (Android app) | Free, no key, offline; only phones with Gemini Nano (e.g. Pixel 9+, Galaxy S25) | Yes, shorter answers, no word list | Phone-dependent |
+| Offline translator (Android app) | Free, no key, offline after a 30 MB download | No, one plain translation | Yes (reads the text on-device) |
+| Basic (web page) | Free, no key | No, one plain translation | No |
 
 The app ships with no key inside it. On first launch it asks each person for their own Claude key,
 which is stored only on their device and sent only to the engine they picked.
@@ -35,7 +37,7 @@ npm run serve      # open the printed address
 npm run android                      # build the web part and copy it into android/
 cd android && ./gradlew assembleDebug
 ```
-The APK lands in `android/app/build/outputs/apk/debug/`. You need the Android SDK (`ANDROID_HOME`)
+The APKs land in `android/app/build/outputs/apk/debug/`, one per chip type: `arm64-v8a` for almost every phone from the last several years, `armeabi-v7a` for older 32-bit phones. You need the Android SDK (`ANDROID_HOME`)
 and JDK 21. For Google Play you need a signed release bundle: `./gradlew bundleRelease` with your
 own signing key.
 
@@ -43,7 +45,8 @@ own signing key.
 [`PROMPT.md`](PROMPT.md) is a standalone prompt you can paste into Claude or a Claude Project.
 
 ## Files
-- `src/providers.js`: the four translation engines
+- `src/providers.js`: the translation engines
+- `src/builtin.js`: the on-device engines (Gemini Nano and ML Kit offline translation + text recognition)
 - `src/voice.js`: speech recognition and playback (native in the Android app, Web Speech in browsers)
 - `src/prompt.js`: system prompt and JSON output schema for the AI engines
 - `src/learn.js`: tense chart data

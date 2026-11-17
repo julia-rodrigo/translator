@@ -3,12 +3,14 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import { SYSTEM_PROMPT, OUTPUT_SCHEMA, JSON_SHAPE_HINT } from "./prompt.js";
+import { isNative, BuiltinError, translatePhoneAi, translateOffline } from "./builtin.js";
 
 export const PROVIDERS = {
   claude: {
     name: "Claude (Anthropic)",
     needsKey: true,
     photos: true,
+    ai: true,
     defaultModel: "claude-haiku-5-5",
     models: [
       ["claude-haiku-5-5", "Haiku 5.5 (cheapest, fast)"],
@@ -17,10 +19,21 @@ export const PROVIDERS = {
     ],
     note: "Paid. Get a key at console.anthropic.com.",
   },
+  // Only inside the Android app: Gemini Nano running on the phone.
+  ...(isNative && {
+    phone: {
+      name: "Built-in Phone AI (free, offline)",
+      needsKey: false,
+      photos: true,
+      ai: true,
+      note: "Free, no key, works offline. Uses Google's Gemini Nano, which only some newer phones have (for example Pixel 9 and later, Galaxy S25). Answers are shorter and less polished than Claude's, with no word list.",
+    },
+  }),
   gemini: {
     name: "Google Gemini",
     needsKey: true,
     photos: true,
+    ai: true,
     defaultModel: "gemini-flash-latest",
     note: "Has a free tier. Get a key at aistudio.google.com.",
   },
@@ -28,16 +41,24 @@ export const PROVIDERS = {
     name: "ChatGPT (OpenAI) or compatible",
     needsKey: true,
     photos: true,
+    ai: true,
     defaultModel: "gpt-4o-mini",
     defaultBaseUrl: "https://api.openai.com/v1",
     note: "OpenAI's API is paid (separate from the free ChatGPT app). Change the address to use another OpenAI-compatible service, such as Groq or OpenRouter.",
   },
-  free: {
-    name: "Basic (no AI, free)",
-    needsKey: false,
-    photos: false,
-    note: "Free and needs no key. Gives one plain translation: no casual/polite choice, no readings, no photos.",
-  },
+  free: isNative
+    ? {
+        name: "Offline translator (free, no AI)",
+        needsKey: false,
+        photos: true,
+        note: "Free, no key, works on any phone and offline after a one-time 30 MB download. Reads photos too. Gives one plain translation: no casual/polite or dialect choice, no readings.",
+      }
+    : {
+        name: "Basic (no AI, free)",
+        needsKey: false,
+        photos: false,
+        note: "Free and needs no key. Gives one plain translation: no casual/polite choice, no readings, no photos.",
+      },
 };
 
 export class TranslateError extends Error {}
@@ -190,12 +211,14 @@ async function translateClaude(input, { apiKey, model }) {
 
 export async function translate(provider, input, settings) {
   try {
-    if (provider === "free") return await translateFree(input);
+    if (provider === "phone") return await translatePhoneAi(input, settings.onProgress);
+    if (provider === "free") return isNative ? await translateOffline(input, settings.onProgress) : await translateFree(input);
     if (provider === "gemini") return await translateGemini(input, settings);
     if (provider === "openai") return await translateOpenAI(input, settings);
     return await translateClaude(input, settings);
   } catch (err) {
     if (err instanceof TranslateError) throw err;
+    if (err instanceof BuiltinError) throw new TranslateError(err.message);
     if (err instanceof TypeError) throw new TranslateError("Couldn't reach the translator. Check your connection.");
     throw new TranslateError(`Something went wrong: ${err.message}`);
   }

@@ -1,4 +1,5 @@
 import { PROVIDERS, translate, TranslateError } from "./providers.js";
+import { isNative, phoneAiStatus } from "./builtin.js";
 import { canSpeak, canListen, speak, startListening, stopListening, isListening } from "./voice.js";
 import { LEARN } from "./learn.js";
 
@@ -72,11 +73,11 @@ function updateEngineLine() {
   const id = currentProvider();
   $("engine-name").textContent = `Translating with: ${PROVIDERS[id].name}`;
   $("photo-label").hidden = !PROVIDERS[id].photos;
-  // Basic mode can't choose a formality, so the picker is hidden rather than greyed out.
-  $("formality").hidden = id === "free";
-  $("dialect").hidden = id === "free";
+  // The non-AI engine can't choose a formality, so the pickers are hidden rather than greyed out.
+  $("formality").hidden = !PROVIDERS[id].ai;
+  $("dialect").hidden = !PROVIDERS[id].ai;
   updateDialectNote();
-  $("basic-note").hidden = id !== "free";
+  $("basic-note").hidden = PROVIDERS[id].ai;
   // First run: ask for the Claude key up front.
   $("setup").hidden = !(id === "claude" && !store.get("key-claude"));
 }
@@ -97,13 +98,27 @@ $("setup-save").addEventListener("click", () => {
   updateEngineLine();
   showStatus("Key saved on this phone. You're ready to translate.");
 });
-$("setup-free").addEventListener("click", () => {
-  store.set("provider", "free");
-  $("provider").value = "free";
+function useEngine(id, message) {
+  store.set("provider", id);
+  $("provider").value = id;
   showProviderFields();
   updateEngineLine();
-  showStatus("Using the free basic translator.");
-});
+  showStatus(message);
+}
+$("setup-free").addEventListener("click", () =>
+  useEngine("free", isNative ? "Using the offline translator." : "Using the free basic translator."));
+// Offer the built-in Phone AI on the first-run card when this phone has it.
+if (isNative) {
+  phoneAiStatus().then((status) => {
+    if (status === "unsupported") {
+      $("setup-builtin-note").textContent = "This phone doesn't have Google's built-in AI, but the offline translator works without a key.";
+      return;
+    }
+    $("setup-builtin").hidden = false;
+  });
+}
+$("setup-builtin").addEventListener("click", () =>
+  useEngine("phone", "Using the built-in Phone AI. The first translation downloads it, which can take a few minutes."));
 $("provider").value = currentProvider();
 // Remember the last formality and dialect picked.
 function updateDialectNote() {
@@ -184,7 +199,8 @@ els.form.addEventListener("submit", async (e) => {
   setBusy(true);
   els.results.innerHTML = "";
   try {
-    render(await translate(id, { text, photo: usePhoto, formality, dialect }, cfg));
+    const onProgress = (msg) => showStatus(msg);
+    render(await translate(id, { text, photo: usePhoto, formality, dialect }, { ...cfg, onProgress }));
     showStatus("");
   } catch (err) {
     showStatus(err instanceof TranslateError ? err.message : `Something went wrong: ${err.message}`, true);
